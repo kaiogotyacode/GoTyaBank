@@ -14,33 +14,47 @@ namespace CodeChallenge02.Repositories
             this.picPayContext = picPayContext;
         }
 
-        public Usuario buscarUsuario(int idUsuario)
+        public Usuario buscarUsuario(int idUsuario) => picPayContext.Usuarios.Where(u => u.Id == idUsuario).FirstOrDefault(new Usuario());
+
+
+
+        public bool novoUsuario(Usuario usuario)
         {
             try
             {
-                var usuario = picPayContext.Usuarios.Where(u => u.Id == idUsuario).FirstOrDefault();
-
-                if (usuario == null)
-                    throw new Exception();
-
-                return usuario;
-
+                picPayContext.Usuarios.Add(usuario);
+                picPayContext.SaveChanges();
+                return true;
             }
-            catch (Exception)
+            catch
             {
-                throw;
+                return false;
+            }
+        }
+
+
+        public bool Transferir(int idPayer, int idPayee, decimal amount)
+        {
+            var payer = picPayContext.Usuarios.FirstOrDefault(x => x.Id == idPayer);
+            var payee = picPayContext.Usuarios.FirstOrDefault(x => x.Id == idPayee);
+
+            if (payer != null && payee != null) {
+                if(payer.Saldo >=  amount)
+                {
+                    try
+                    {
+                        payer.Saldo -= amount;
+                        payee.Saldo += amount;
+                        return true;
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
             }
 
-        }
-
-        public IActionResult novoUsuario(Usuario usuario)
-        {
-            
-        }
-
-        public IActionResult Transferir(int idUsuario)
-        {
-            throw new NotImplementedException();
+            return false;
         }
     }
 }
