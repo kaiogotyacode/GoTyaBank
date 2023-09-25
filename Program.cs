@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(x => x.SchemaFilter<NovoUsuarioFilterSW>());
+builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<PicPayContext>(db => db.UseSqlServer(builder.Configuration.GetConnectionString("Database")));
 builder.Services.AddTransient<IUsuarioComumRepository, UsuarioComumRepository>();
 

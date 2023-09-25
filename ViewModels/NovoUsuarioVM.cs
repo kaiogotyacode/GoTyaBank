@@ -23,7 +23,7 @@ namespace CodeChallenge02.ViewModels
         public string? CNPJ { get; set; }
 
         [Required]
-        public bool isPessoaFisica { get; set; }
+        public bool IsPessoaFisica { get; set; }
 
     }
 }

@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CodeChallenge02.Migrations
 {
     [DbContext(typeof(PicPayContext))]
-    [Migration("20230925084303_Migration-004")]
-    partial class Migration004
+    [Migration("20230925123841_Migration-008")]
+    partial class Migration008
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -61,14 +61,6 @@ namespace CodeChallenge02.Migrations
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CNPJ")
-                        .IsUnique()
-                        .HasFilter("[isPessoaFisica] = 0");
-
-                    b.HasIndex("CPF")
-                        .IsUnique()
-                        .HasFilter("[isPessoaFisica] = 1");
 
                     b.ToTable("Usuarios");
 

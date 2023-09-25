@@ -59,14 +59,6 @@ namespace CodeChallenge02.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CNPJ")
-                        .IsUnique()
-                        .HasFilter("[isPessoaFisica] = 0");
-
-                    b.HasIndex("CPF")
-                        .IsUnique()
-                        .HasFilter("[isPessoaFisica] = 1");
-
                     b.ToTable("Usuarios");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("Usuario");

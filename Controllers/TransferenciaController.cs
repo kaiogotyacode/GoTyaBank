@@ -18,29 +18,40 @@ namespace CodeChallenge02.Controllers
 
         [HttpPost]
         [Route("novoUsuario")]
-        public IActionResult novoUsuario([FromQuery] NovoUsuarioVM usuario)
+        public async Task<IActionResult> novoUsuario([FromQuery] NovoUsuarioVM usuarioVM)
         {
-            try
-            {
-                if (ModelState.IsValid)
-                    _usuarioComumRepository.novoUsuario(
-                        new UsuarioComum
-                        {
-                            Nome = usuario.Nome,
-                            Email = usuario.Email,
-                            CPF = usuario.CPF,
-                            CNPJ = usuario.CNPJ,
-                            isPessoaFisica = usuario.isPessoaFisica
-                        });
 
-                return Ok(new {message = "User successfully created!", usuario = usuario});
+            if (ModelState.IsValid)
+            {
+
+                var usuario = new UsuarioComum
+                {
+                    Nome = usuarioVM.Nome,
+                    Email = usuarioVM.Email,
+                    CPF = usuarioVM.CPF,
+                    CNPJ = usuarioVM.CNPJ,
+                    isPessoaFisica = usuarioVM.IsPessoaFisica
+                };
+
+                if (usuario.isPessoaFisica)
+                    usuario.CNPJ = null;
+                else
+                    usuario.CPF = null;
+
+                try
+                {
+                    if (await _usuarioComumRepository.novoUsuario(usuario))
+                        return Created("/API/[controller]/novoUsuario", usuario);
+
+                }
+                catch
+                {
+                    return BadRequest(usuarioVM);
+                }
 
             }
-            catch
-            {
-                return BadRequest(usuario);
-            }
 
+            return BadRequest(usuarioVM);
         }
     }
 }

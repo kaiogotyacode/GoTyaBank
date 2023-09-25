@@ -5,6 +5,8 @@ namespace CodeChallenge02.Models
 {
     public class Usuario
     {
+        [Key]
+        public int Id { get; set; } 
         public Usuario() => Saldo = 300.00m;     
 
         [Required]
