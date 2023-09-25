@@ -2,7 +2,7 @@
 
 namespace CodeChallenge02.ViewModels
 {
-    public class UsuarioTransferenciaVM
+    public class TransferenciaVM
     {
         [Required]
         [MaxLength(18)]

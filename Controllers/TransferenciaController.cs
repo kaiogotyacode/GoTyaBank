@@ -18,13 +18,12 @@ namespace CodeChallenge02.Controllers
 
         [HttpPost]
         [Route("novoUsuario")]
-        public async Task<IActionResult> novoUsuario([FromQuery] NovoUsuarioVM usuarioVM)
+        public async Task<IActionResult> novoUsuario([FromBody] NovoUsuarioVM usuarioVM)
         {
 
             if (ModelState.IsValid)
             {
-
-                var usuario = new UsuarioComum
+                var usuario = new Usuario
                 {
                     Nome = usuarioVM.Nome,
                     Email = usuarioVM.Email,
@@ -42,7 +41,6 @@ namespace CodeChallenge02.Controllers
                 {
                     if (await _usuarioComumRepository.novoUsuario(usuario))
                         return Created("/API/[controller]/novoUsuario", usuario);
-
                 }
                 catch
                 {
@@ -52,6 +50,28 @@ namespace CodeChallenge02.Controllers
             }
 
             return BadRequest(usuarioVM);
+        }
+
+        [HttpPost]
+        [Route("transferir")]
+        public async Task<IActionResult> Transferir([FromBody] TransferenciaVM transferenciaVM)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    if (await _usuarioComumRepository.Transferir(transferenciaVM))
+                        return Accepted("/API/[controller]/transferir", transferenciaVM);
+
+                }
+                catch
+                {
+                    return BadRequest(new { message = "Erro ao realizar a transferência!", transferencia = transferenciaVM});
+                }
+            }
+
+            return BadRequest(new { message = "Por favor, verifique os dados de ambos, tal como o valor da transferência e tente novamente!", transferencia = transferenciaVM });
+
         }
     }
 }

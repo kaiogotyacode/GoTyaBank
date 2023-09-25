@@ -1,6 +1,7 @@
 ﻿using CodeChallenge02.Database;
 using CodeChallenge02.Models;
 using CodeChallenge02.Repositories.Interfaces;
+using CodeChallenge02.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace CodeChallenge02.Repositories
@@ -17,7 +18,7 @@ namespace CodeChallenge02.Repositories
         public async Task<Usuario?> buscarUsuarioCPF(string CPF) => await picPayContext.Usuarios.Where(u => u.CPF == CPF).FirstOrDefaultAsync();
 
 
-        public async Task<bool> novoUsuario(UsuarioComum usuario)
+        public async Task<bool> novoUsuario(Usuario usuario)
         {
             try
             {
@@ -31,16 +32,17 @@ namespace CodeChallenge02.Repositories
             }
         }
 
-
-        public async Task<bool> Transferir(string idPayer, string idPayee, decimal amount)
+        public async Task<bool> Transferir(TransferenciaVM transferenciaVM)
         {
-            var payer = await picPayContext.Usuarios.FirstOrDefaultAsync(x => x.CPF == idPayer || x.CNPJ == idPayer);
-            var payee = await picPayContext.Usuarios.FirstOrDefaultAsync(x => x.CPF == idPayee || x.CNPJ == idPayee);
+            //Se o usuário for lojista, não permitir o cadastro.
 
-            if (payer.Saldo >= amount)
+            var payer = await picPayContext.Usuarios.FirstOrDefaultAsync(x => x.CPF == transferenciaVM.CadastroPagador || x.CNPJ == transferenciaVM.CadastroPagador);
+            var payee = await picPayContext.Usuarios.FirstOrDefaultAsync(x => x.CPF == transferenciaVM.CadastroBeneficiario || x.CNPJ == transferenciaVM.CadastroBeneficiario);
+
+            if (payer.Saldo >= transferenciaVM.ValorTransferencia)
             {
-                payer.Saldo -= amount;
-                payee.Saldo += amount;
+                payer.Saldo -= transferenciaVM.ValorTransferencia;
+                payee.Saldo += transferenciaVM.ValorTransferencia;
 
                 picPayContext.Update(payee);
                 picPayContext.Update(payer);
