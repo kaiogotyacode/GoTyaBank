@@ -3,6 +3,7 @@ using CodeChallenge02.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CodeChallenge02.Migrations
 {
     [DbContext(typeof(PicPayContext))]
-    partial class PicPayContextModelSnapshot : ModelSnapshot
+    [Migration("20230925082151_Migration-003")]
+    partial class Migration003
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -58,14 +61,6 @@ namespace CodeChallenge02.Migrations
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CNPJ")
-                        .IsUnique()
-                        .HasFilter("[isPessoaFisica] = 0");
-
-                    b.HasIndex("CPF")
-                        .IsUnique()
-                        .HasFilter("[isPessoaFisica] = 1");
 
                     b.ToTable("Usuarios");
 

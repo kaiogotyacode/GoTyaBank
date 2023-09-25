@@ -1,8 +1,7 @@
 ﻿using CodeChallenge02.Database;
 using CodeChallenge02.Models;
 using CodeChallenge02.Repositories.Interfaces;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CodeChallenge02.Repositories
 {
@@ -14,16 +13,16 @@ namespace CodeChallenge02.Repositories
             this.picPayContext = picPayContext;
         }
 
-        public Usuario buscarUsuario(int idUsuario) => picPayContext.Usuarios.Where(u => u.Id == idUsuario).FirstOrDefault(new Usuario());
+        public async Task<Usuario?> buscarUsuarioCNPJ(string CNPJ) => await picPayContext.Usuarios.Where(u => u.CNPJ == CNPJ).FirstOrDefaultAsync();
+        public async Task<Usuario?> buscarUsuarioCPF(string CPF) => await picPayContext.Usuarios.Where(u => u.CPF == CPF).FirstOrDefaultAsync();
 
 
-
-        public bool novoUsuario(Usuario usuario)
+        public async Task<bool> novoUsuario(UsuarioComum usuario)
         {
             try
             {
-                picPayContext.Usuarios.Add(usuario);
-                picPayContext.SaveChanges();
+                await picPayContext.Usuarios.AddAsync(usuario);
+                await picPayContext.SaveChangesAsync();
                 return true;
             }
             catch
@@ -33,25 +32,21 @@ namespace CodeChallenge02.Repositories
         }
 
 
-        public bool Transferir(int idPayer, int idPayee, decimal amount)
+        public async Task<bool> Transferir(string idPayer, string idPayee, decimal amount)
         {
-            var payer = picPayContext.Usuarios.FirstOrDefault(x => x.Id == idPayer);
-            var payee = picPayContext.Usuarios.FirstOrDefault(x => x.Id == idPayee);
+            var payer = await picPayContext.Usuarios.FirstOrDefaultAsync(x => x.CPF == idPayer || x.CNPJ == idPayer);
+            var payee = await picPayContext.Usuarios.FirstOrDefaultAsync(x => x.CPF == idPayee || x.CNPJ == idPayee);
 
-            if (payer != null && payee != null) {
-                if(payer.Saldo >=  amount)
-                {
-                    try
-                    {
-                        payer.Saldo -= amount;
-                        payee.Saldo += amount;
-                        return true;
-                    }
-                    catch
-                    {
-                        return false;
-                    }
-                }
+            if (payer.Saldo >= amount)
+            {
+                payer.Saldo -= amount;
+                payee.Saldo += amount;
+
+                picPayContext.Update(payee);
+                picPayContext.Update(payer);
+                await picPayContext.SaveChangesAsync();
+
+                return true;
             }
 
             return false;

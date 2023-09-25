@@ -1,4 +1,6 @@
 using CodeChallenge02.Database;
+using CodeChallenge02.Repositories;
+using CodeChallenge02.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,8 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(x => x.SchemaFilter<NovoUsuarioFilterSW>());
 builder.Services.AddDbContext<PicPayContext>(db => db.UseSqlServer(builder.Configuration.GetConnectionString("Database")));
+builder.Services.AddTransient<IUsuarioComumRepository, UsuarioComumRepository>();
 
 var app = builder.Build();
 
