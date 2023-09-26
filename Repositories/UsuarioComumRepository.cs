@@ -45,5 +45,48 @@ namespace CodeChallenge02.Repositories
 
             return false;
         }
+
+        public async Task<bool> Transferir(TransferenciaVM transferenciaVM)
+        {
+            try
+            {
+                var payer = await picPayContext.UsuariosComuns.Where(x => x.CPF == transferenciaVM.payerID).FirstOrDefaultAsync();
+
+                var hasPayee = false;
+
+                switch (transferenciaVM.payeeID.Length)
+                {
+                    case 14:
+                        hasPayee = await picPayContext.UsuariosComuns.Where(x => x.CPF == transferenciaVM.payerID).AnyAsync();
+                        break;
+                    case 18:
+                        hasPayee = await picPayContext.Lojistas.Where(x => x.CNPJ == transferenciaVM.payerID).AnyAsync();
+                        break;
+                    default:
+                        return false;
+                }
+
+                if (payer == null || !hasPayee)
+                    return false;
+
+                if (!(payer.Saldo >= transferenciaVM.Amount))
+                    return false;
+
+
+                // Realiza a transferencia. Resolver complexidade do PAYEE CNPJ/CPF 
+                payer.Saldo -= transferenciaVM.Amount;
+
+
+
+
+                return true;
+            }
+            catch
+            {
+                return false;
+
+            }
+
+        }
     }
 }

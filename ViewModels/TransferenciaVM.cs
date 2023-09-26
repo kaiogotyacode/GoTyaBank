@@ -5,15 +5,17 @@ namespace CodeChallenge02.ViewModels
     public class TransferenciaVM
     {
         [Required]
-        [MaxLength(18)]
-        public string? CadastroPagador { get; set; }
+        [MaxLength(14, ErrorMessage = "CPF inválido, verifique os campo e tente novamente")]
+        [MinLength(14, ErrorMessage = "CPF inválido, verifique os campo e tente novamente")]
+        public string? payerID { get; set; }
 
         [Required]
-        [MaxLength(18)]
-        public string? CadastroBeneficiario { get; set; }
+        [MaxLength(18, ErrorMessage = "CPF ou CNPJ inválido, verifique os campo e tente novamente")]
+        [MinLength(14, ErrorMessage = "CPF ou CNPJ inválido, verifique os campo e tente novamente")]
+        public string? payeeID { get; set; }
 
         [Required]        
-        public decimal ValorTransferencia { get; set; }
+        public decimal Amount { get; set; }
 
     }
 }

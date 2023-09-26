@@ -22,7 +22,7 @@ namespace CodeChallenge02.Controllers
       
         [HttpPost]
         [Route("CreateLojista")]
-        public async Task<IActionResult> CreateLojista([FromQuery] LojistaVM lojistaVM)
+        public async Task<IActionResult> CreateLojista([FromBody] LojistaVM lojistaVM)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
