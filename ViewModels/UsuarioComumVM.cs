@@ -2,7 +2,7 @@
 
 namespace CodeChallenge02.ViewModels
 {
-    public class NovoUsuarioVM
+    public class UsuarioComumVM
     {       
 
         [Required]
@@ -16,14 +16,8 @@ namespace CodeChallenge02.ViewModels
 
         [Required]
         [MaxLength(14)]
-        public string? CPF { get; set; }
-
-        [Required]
-        [MaxLength(18)]
-        public string? CNPJ { get; set; }
-
-        [Required]
-        public bool IsPessoaFisica { get; set; }
+        [MinLength(14)]
+        public string? CPF { get; set; } 
 
     }
 }

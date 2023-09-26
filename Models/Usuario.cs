@@ -13,14 +13,6 @@ namespace CodeChallenge02.Models
         [MaxLength(70)]
         public string? Nome { get; set; }
 
-        //[Required]
-        [MaxLength(14)]
-        public string? CPF { get; set; }
-
-        //[Required]
-        [MaxLength(18)]
-        public string? CNPJ { get; set; }
-
         [Required]
         public bool isPessoaFisica { get; set; }
 

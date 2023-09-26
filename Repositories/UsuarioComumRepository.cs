@@ -2,7 +2,9 @@
 using CodeChallenge02.Models;
 using CodeChallenge02.Repositories.Interfaces;
 using CodeChallenge02.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace CodeChallenge02.Repositories
 {
@@ -13,45 +15,59 @@ namespace CodeChallenge02.Repositories
         {
             this.picPayContext = picPayContext;
         }
-
-        public async Task<Usuario?> buscarUsuarioCNPJ(string CNPJ) => await picPayContext.Usuarios.Where(u => u.CNPJ == CNPJ).FirstOrDefaultAsync();
-        public async Task<Usuario?> buscarUsuarioCPF(string CPF) => await picPayContext.Usuarios.Where(u => u.CPF == CPF).FirstOrDefaultAsync();
-
-
-        public async Task<bool> novoUsuario(Usuario usuario)
+        #region Post Methods
+        public async Task<Lojista?> CreateLojista(LojistaVM lojistaVM)
         {
-            try
+            var lojista = new Lojista
             {
-                await picPayContext.Usuarios.AddAsync(usuario);
-                await picPayContext.SaveChangesAsync();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+                Nome = lojistaVM.Nome,
+                Email = lojistaVM.Email,
+                CNPJ = lojistaVM.CNPJ,
+                isPessoaFisica = false
+            };
+
+            await picPayContext.Lojistas.AddAsync(lojista);
+            await picPayContext.SaveChangesAsync();
+
+            return lojista;
         }
 
-        public async Task<bool> Transferir(TransferenciaVM transferenciaVM)
+        public Task<UsuarioComum?> CreateUsuarioComum(UsuarioComumVM usuarioComumVM)
         {
-            //Se o usuário for lojista, não permitir o cadastro.
+            throw new NotImplementedException();
+        }
 
-            var payer = await picPayContext.Usuarios.FirstOrDefaultAsync(x => x.CPF == transferenciaVM.CadastroPagador || x.CNPJ == transferenciaVM.CadastroPagador);
-            var payee = await picPayContext.Usuarios.FirstOrDefaultAsync(x => x.CPF == transferenciaVM.CadastroBeneficiario || x.CNPJ == transferenciaVM.CadastroBeneficiario);
+        #endregion Post Methods
 
-            if (payer.Saldo >= transferenciaVM.ValorTransferencia)
+        public async Task<GetUserVM?> GetUserByID(string userID)
+        {
+            if (userID.Length != 14 && userID.Length != 18)
+                throw new ArgumentException("userID doesn't agree with the business rule.");
+
+            var usuario = new GetUserVM();
+
+            if (userID.Length == 14)
             {
-                payer.Saldo -= transferenciaVM.ValorTransferencia;
-                payee.Saldo += transferenciaVM.ValorTransferencia;
+                var usuarioComum = await picPayContext.UsuariosComuns.Where(x => x.CPF == userID).FirstOrDefaultAsync();
 
-                picPayContext.Update(payee);
-                picPayContext.Update(payer);
-                await picPayContext.SaveChangesAsync();
+                if (usuarioComum != null)
+                {
+                    usuario.userID = usuarioComum.CPF;
+                    usuario.Name = usuarioComum.Nome;
+                }
 
-                return true;
+                return usuario;
             }
 
-            return false;
+            var lojista = await picPayContext.Lojistas.Where(x => x.CNPJ == userID).FirstOrDefaultAsync();
+
+            if (lojista != null)
+            {
+                usuario.userID = lojista.CNPJ;
+                usuario.Name = lojista.Nome;
+            }
+
+            return usuario;
         }
     }
 }

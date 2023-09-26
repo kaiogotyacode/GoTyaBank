@@ -16,62 +16,48 @@ namespace CodeChallenge02.Controllers
             _usuarioComumRepository = usuarioComumRepository;
         }
 
+        #region Post Methods
         [HttpPost]
-        [Route("novoUsuario")]
-        public async Task<IActionResult> novoUsuario([FromBody] NovoUsuarioVM usuarioVM)
+        [Route("CreateLojista")]
+        public async Task<IActionResult> CreateLojista([FromQuery] LojistaVM lojistaVM)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            if (ModelState.IsValid)
+            try
             {
-                var usuario = new Usuario
-                {
-                    Nome = usuarioVM.Nome,
-                    Email = usuarioVM.Email,
-                    CPF = usuarioVM.CPF,
-                    CNPJ = usuarioVM.CNPJ,
-                    isPessoaFisica = usuarioVM.IsPessoaFisica
-                };
+                var lojista = await _usuarioComumRepository.CreateLojista(lojistaVM);
 
-                if (usuario.isPessoaFisica)
-                    usuario.CNPJ = null;
-                else
-                    usuario.CPF = null;
-
-                try
-                {
-                    if (await _usuarioComumRepository.novoUsuario(usuario))
-                        return Created("/API/[controller]/novoUsuario", usuario);
-                }
-                catch
-                {
-                    return BadRequest(usuarioVM);
-                }
-
+                return Created("/API/[controller]/CreateLojista", lojista);
+            }
+            catch
+            {
+                return BadRequest(lojistaVM);
             }
 
-            return BadRequest(usuarioVM);
         }
 
         [HttpPost]
-        [Route("transferir")]
-        public async Task<IActionResult> Transferir([FromBody] TransferenciaVM transferenciaVM)
+        [Route("CreateUsuarioComum")]
+        public async Task<IActionResult> CreateUsuarioComum(UsuarioComumVM usuarioComumVM)
         {
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    if (await _usuarioComumRepository.Transferir(transferenciaVM))
-                        return Accepted("/API/[controller]/transferir", transferenciaVM);
-
-                }
-                catch
-                {
-                    return BadRequest(new { message = "Erro ao realizar a transferência!", transferencia = transferenciaVM});
-                }
-            }
-
-            return BadRequest(new { message = "Por favor, verifique os dados de ambos, tal como o valor da transferência e tente novamente!", transferencia = transferenciaVM });
-
+            return Ok();
         }
+
+        #endregion Post Methods
+
+        /// <summary>
+        /// Busca um Usuário a partir de uma chave existente (CPF ou CNPJ).
+        /// </summary>
+        /// <param name="userID">CNPJ ou CPF do usuário.</param>
+        /// <returns>Retorna uma mensagem validando se o usuário existe, e seu respectivo nome. </returns>
+        [HttpGet]
+        [Route("GetUserByID")]
+        public async Task<IActionResult> GetUserByID([FromBody]string userID)
+        {
+            
+            return Ok();
+        }
+
     }
 }

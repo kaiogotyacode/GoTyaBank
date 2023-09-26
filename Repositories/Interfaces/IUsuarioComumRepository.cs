@@ -6,9 +6,8 @@ namespace CodeChallenge02.Repositories.Interfaces
 {
     public interface IUsuarioComumRepository
     {
-        public Task<bool> novoUsuario(Usuario usuario); 
-        public Task<Usuario?> buscarUsuarioCNPJ(string CNPJ);
-        public Task<Usuario?> buscarUsuarioCPF(string CPF);
-        public Task<bool> Transferir(TransferenciaVM transferenciaVM);
+        public Task<UsuarioComum?> CreateUsuarioComum(UsuarioComumVM usuarioComumVM);
+        public Task<Lojista?> CreateLojista(LojistaVM lojistaVM);
+        public Task<GetUserVM?> GetUserByID(string userID);
     }
 }
