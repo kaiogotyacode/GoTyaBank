@@ -6,8 +6,7 @@ namespace CodeChallenge02.Repositories.Interfaces
 {
     public interface IUsuarioComumRepository
     {
-        public Task<UsuarioComum?> CreateUsuarioComum(UsuarioComumVM usuarioComumVM);
-        public Task<Lojista?> CreateLojista(LojistaVM lojistaVM);
-        public Task<GetUserVM?> GetUserByID(string userID);
+        public Task<UsuarioComum?> CreateUsuarioComum(UsuarioComumVM usuarioComumVM);        
+        public Task<bool> GetUserByID(string? userID, string? email);
     }
 }

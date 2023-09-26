@@ -15,59 +15,35 @@ namespace CodeChallenge02.Repositories
         {
             this.picPayContext = picPayContext;
         }
-        #region Post Methods
-        public async Task<Lojista?> CreateLojista(LojistaVM lojistaVM)
+        #region Post Methods      
+
+        public async Task<UsuarioComum?> CreateUsuarioComum(UsuarioComumVM usuarioComumVM)
         {
-            var lojista = new Lojista
+            var usuarioComum = new UsuarioComum
             {
-                Nome = lojistaVM.Nome,
-                Email = lojistaVM.Email,
-                CNPJ = lojistaVM.CNPJ,
-                isPessoaFisica = false
+                Nome = usuarioComumVM.Nome,
+                Email = usuarioComumVM.Email,
+                CPF = usuarioComumVM.CPF,
+                isPessoaFisica = true
             };
 
-            await picPayContext.Lojistas.AddAsync(lojista);
+            await picPayContext.UsuariosComuns.AddAsync(usuarioComum);
             await picPayContext.SaveChangesAsync();
 
-            return lojista;
-        }
-
-        public Task<UsuarioComum?> CreateUsuarioComum(UsuarioComumVM usuarioComumVM)
-        {
-            throw new NotImplementedException();
+            return usuarioComum;
         }
 
         #endregion Post Methods
 
-        public async Task<GetUserVM?> GetUserByID(string userID)
+        public async Task<bool> GetUserByID(string? userID, string? email)
         {
-            if (userID.Length != 14 && userID.Length != 18)
-                throw new ArgumentException("userID doesn't agree with the business rule.");
+            var hasEmail = await picPayContext.Usuarios.Where(x => x.Email == email).AnyAsync();
+            var hasID = await picPayContext.UsuariosComuns.Where(x => x.CPF == userID).AnyAsync();
 
-            var usuario = new GetUserVM();
+            if (hasEmail || hasID)
+                return true;
 
-            if (userID.Length == 14)
-            {
-                var usuarioComum = await picPayContext.UsuariosComuns.Where(x => x.CPF == userID).FirstOrDefaultAsync();
-
-                if (usuarioComum != null)
-                {
-                    usuario.userID = usuarioComum.CPF;
-                    usuario.Name = usuarioComum.Nome;
-                }
-
-                return usuario;
-            }
-
-            var lojista = await picPayContext.Lojistas.Where(x => x.CNPJ == userID).FirstOrDefaultAsync();
-
-            if (lojista != null)
-            {
-                usuario.userID = lojista.CNPJ;
-                usuario.Name = lojista.Nome;
-            }
-
-            return usuario;
+            return false;
         }
     }
 }

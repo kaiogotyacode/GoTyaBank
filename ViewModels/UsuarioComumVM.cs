@@ -3,7 +3,7 @@
 namespace CodeChallenge02.ViewModels
 {
     public class UsuarioComumVM
-    {       
+    {
 
         [Required]
         [MaxLength(70)]
@@ -15,9 +15,9 @@ namespace CodeChallenge02.ViewModels
         public string? Email { get; set; }
 
         [Required]
-        [MaxLength(14)]
-        [MinLength(14)]
-        public string? CPF { get; set; } 
+        [MaxLength(14, ErrorMessage = "CPF inválido, verifique os campos e tente novamente")]
+        [MinLength(14, ErrorMessage = "CPF inválido, verifique os campos e tente novamente")]
+        public string? CPF { get; set; }
 
     }
 }

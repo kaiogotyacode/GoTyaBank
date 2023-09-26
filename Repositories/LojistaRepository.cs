@@ -1,19 +1,35 @@
-﻿using CodeChallenge02.Models;
+﻿using CodeChallenge02.Database;
+using CodeChallenge02.Models;
 using CodeChallenge02.Repositories.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+using CodeChallenge02.ViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace CodeChallenge02.Repositories
 {
     public class LojistaRepository : ILojistaRepository
     {
-        public Usuario buscarLojista(int idUsuario)
+        private readonly PicPayContext picPayContext;
+        public LojistaRepository(PicPayContext picPayContext)
         {
-            throw new NotImplementedException();
+            this.picPayContext = picPayContext;
         }
-
-        public IActionResult novoLojista(Usuario usuario)
+        public async Task<Lojista?> CreateLojista(LojistaVM lojistaVM)
         {
-            throw new NotImplementedException();
+            if (await picPayContext.Lojistas.Where(x => x.Email == lojistaVM.Email || x.CNPJ == lojistaVM.CNPJ).AnyAsync())
+                throw new Exception("User ID or E-mail already exists.");
+
+            var lojista = new Lojista
+            {
+                Nome = lojistaVM.Nome,
+                Email = lojistaVM.Email,
+                CNPJ = lojistaVM.CNPJ,
+                isPessoaFisica = false
+            };
+
+            await picPayContext.Lojistas.AddAsync(lojista);
+            await picPayContext.SaveChangesAsync();
+
+            return lojista;
         }
     }
 }

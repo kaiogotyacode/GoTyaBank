@@ -13,6 +13,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<PicPayContext>(db => db.UseSqlServer(builder.Configuration.GetConnectionString("Database")));
 builder.Services.AddTransient<IUsuarioComumRepository, UsuarioComumRepository>();
+builder.Services.AddTransient<ILojistaRepository, LojistaRepository>();
 
 var app = builder.Build();
 

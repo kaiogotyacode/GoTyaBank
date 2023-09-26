@@ -2,6 +2,7 @@
 using CodeChallenge02.Models;
 using CodeChallenge02.Repositories.Interfaces;
 using CodeChallenge02.ViewModels;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CodeChallenge02.Controllers
@@ -11,12 +12,14 @@ namespace CodeChallenge02.Controllers
     public class TransferenciaController : ControllerBase
     {
         private readonly IUsuarioComumRepository _usuarioComumRepository;
-        public TransferenciaController(IUsuarioComumRepository usuarioComumRepository)
+        private readonly ILojistaRepository _lojistaRepository;
+        public TransferenciaController(IUsuarioComumRepository usuarioComumRepository, ILojistaRepository lojistaRepository)
         {
             _usuarioComumRepository = usuarioComumRepository;
+            _lojistaRepository = lojistaRepository;
         }
 
-        #region Post Methods
+      
         [HttpPost]
         [Route("CreateLojista")]
         public async Task<IActionResult> CreateLojista([FromQuery] LojistaVM lojistaVM)
@@ -26,7 +29,7 @@ namespace CodeChallenge02.Controllers
 
             try
             {
-                var lojista = await _usuarioComumRepository.CreateLojista(lojistaVM);
+                var lojista = await _lojistaRepository.CreateLojista(lojistaVM);
 
                 return Created("/API/[controller]/CreateLojista", lojista);
             }
@@ -41,23 +44,27 @@ namespace CodeChallenge02.Controllers
         [Route("CreateUsuarioComum")]
         public async Task<IActionResult> CreateUsuarioComum(UsuarioComumVM usuarioComumVM)
         {
-            return Ok();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                if (await _usuarioComumRepository.GetUserByID(usuarioComumVM.CPF, usuarioComumVM.Email))
+                    return Conflict(new { error = "UserID or E-mail already exists!", usuario = usuarioComumVM });
+
+                var usuario = await _usuarioComumRepository.CreateUsuarioComum(usuarioComumVM);
+                return Created("/API/[controller]/CreateUsuarioComum", usuario);
+
+            }
+            catch
+            {
+                return BadRequest(usuarioComumVM);
+            }
+
         }
 
-        #endregion Post Methods
-
-        /// <summary>
-        /// Busca um Usuário a partir de uma chave existente (CPF ou CNPJ).
-        /// </summary>
-        /// <param name="userID">CNPJ ou CPF do usuário.</param>
-        /// <returns>Retorna uma mensagem validando se o usuário existe, e seu respectivo nome. </returns>
-        [HttpGet]
-        [Route("GetUserByID")]
-        public async Task<IActionResult> GetUserByID([FromBody]string userID)
-        {
+  
             
-            return Ok();
-        }
 
     }
 }

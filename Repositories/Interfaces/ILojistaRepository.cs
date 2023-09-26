@@ -1,11 +1,12 @@
 ﻿using CodeChallenge02.Models;
+using CodeChallenge02.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CodeChallenge02.Repositories.Interfaces
 {
     public interface ILojistaRepository
     {
-        public IActionResult novoLojista(Usuario usuario); 
-        public Usuario buscarLojista(int idUsuario);       
+        public Task<Lojista?> CreateLojista(LojistaVM lojistaVM);
+
     }
 }
