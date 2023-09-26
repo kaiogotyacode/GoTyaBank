@@ -31,5 +31,16 @@ namespace CodeChallenge02.Repositories
 
             return lojista;
         }
+
+        public async Task<bool> GetLojistaByID(LojistaVM lojistaVM)
+        {
+            var hasEmail = await picPayContext.Usuarios.Where(x => x.Email == lojistaVM.Email).AnyAsync();
+            var hasID = await picPayContext.Lojistas.Where(x => x.CNPJ == lojistaVM.CNPJ).AnyAsync();
+
+            if (hasEmail || hasID)
+                return true;
+
+            return false;
+        }
     }
 }

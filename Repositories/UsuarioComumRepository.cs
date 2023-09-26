@@ -35,10 +35,10 @@ namespace CodeChallenge02.Repositories
 
         #endregion Post Methods
 
-        public async Task<bool> GetUserByID(string? userID, string? email)
+        public async Task<bool> GetUsuarioComumByID(UsuarioComumVM usuarioComumVM)
         {
-            var hasEmail = await picPayContext.Usuarios.Where(x => x.Email == email).AnyAsync();
-            var hasID = await picPayContext.UsuariosComuns.Where(x => x.CPF == userID).AnyAsync();
+            var hasEmail = await picPayContext.Usuarios.Where(x => x.Email == usuarioComumVM.Email).AnyAsync();
+            var hasID = await picPayContext.UsuariosComuns.Where(x => x.CPF == usuarioComumVM.CPF).AnyAsync();
 
             if (hasEmail || hasID)
                 return true;

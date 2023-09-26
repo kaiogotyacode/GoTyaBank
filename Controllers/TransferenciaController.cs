@@ -29,6 +29,9 @@ namespace CodeChallenge02.Controllers
 
             try
             {
+                if (await _lojistaRepository.GetLojistaByID(lojistaVM))
+                    return Conflict(new { error = "UserID or E-mail already exists!", lojista = lojistaVM});
+
                 var lojista = await _lojistaRepository.CreateLojista(lojistaVM);
 
                 return Created("/API/[controller]/CreateLojista", lojista);
@@ -49,7 +52,7 @@ namespace CodeChallenge02.Controllers
 
             try
             {
-                if (await _usuarioComumRepository.GetUserByID(usuarioComumVM.CPF, usuarioComumVM.Email))
+                if (await _usuarioComumRepository.GetUsuarioComumByID(usuarioComumVM))
                     return Conflict(new { error = "UserID or E-mail already exists!", usuario = usuarioComumVM });
 
                 var usuario = await _usuarioComumRepository.CreateUsuarioComum(usuarioComumVM);
