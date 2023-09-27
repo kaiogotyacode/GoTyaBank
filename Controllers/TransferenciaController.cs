@@ -29,7 +29,7 @@ namespace CodeChallenge02.Controllers
 
             try
             {
-                if (await _lojistaRepository.GetLojistaByID(lojistaVM))
+                if (await _lojistaRepository.HasLojista(lojistaVM))
                     return Conflict(new { error = "UserID or E-mail already exists!", lojista = lojistaVM});
 
                 var lojista = await _lojistaRepository.CreateLojista(lojistaVM);
@@ -52,7 +52,7 @@ namespace CodeChallenge02.Controllers
 
             try
             {
-                if (await _usuarioComumRepository.GetUsuarioComumByID(usuarioComumVM))
+                if (await _usuarioComumRepository.HasUsuarioComum(usuarioComumVM))
                     return Conflict(new { error = "UserID or E-mail already exists!", usuario = usuarioComumVM });
 
                 var usuario = await _usuarioComumRepository.CreateUsuarioComum(usuarioComumVM);
@@ -66,8 +66,27 @@ namespace CodeChallenge02.Controllers
 
         }
 
-  
-            
+        [HttpPut]
+        [Route("Transferir")]
+        public async Task<IActionResult> Transferir(TransferenciaVM transferenciaVM)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var transferencia = await _usuarioComumRepository.Transferir(transferenciaVM);
+                if (!transferencia)
+                    return BadRequest(new {error = "Não foi possível seguir com a transferência!", transferencia = transferenciaVM});
+
+                return Ok(new { message = "Transferência realizada com sucesso!", transferencia = transferenciaVM });                
+            }
+            catch
+            {
+                    return BadRequest();    
+            }
+
+        }
 
     }
 }

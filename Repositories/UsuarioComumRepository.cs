@@ -35,7 +35,7 @@ namespace CodeChallenge02.Repositories
 
         #endregion Post Methods
 
-        public async Task<bool> GetUsuarioComumByID(UsuarioComumVM usuarioComumVM)
+        public async Task<bool> HasUsuarioComum(UsuarioComumVM usuarioComumVM)
         {
             var hasEmail = await picPayContext.Usuarios.Where(x => x.Email == usuarioComumVM.Email).AnyAsync();
             var hasID = await picPayContext.UsuariosComuns.Where(x => x.CPF == usuarioComumVM.CPF).AnyAsync();
@@ -50,6 +50,9 @@ namespace CodeChallenge02.Repositories
         {
             try
             {
+                if (transferenciaVM.payerID == transferenciaVM.payeeID)
+                    return false;
+
                 var payer = await picPayContext.UsuariosComuns.Where(x => x.CPF == transferenciaVM.payerID).FirstOrDefaultAsync();
 
                 var hasPayee = false;
@@ -60,7 +63,7 @@ namespace CodeChallenge02.Repositories
                         hasPayee = await picPayContext.UsuariosComuns.Where(x => x.CPF == transferenciaVM.payerID).AnyAsync();
                         break;
                     case 18:
-                        hasPayee = await picPayContext.Lojistas.Where(x => x.CNPJ == transferenciaVM.payerID).AnyAsync();
+                        hasPayee = await picPayContext.Lojistas.Where(x => x.CNPJ == transferenciaVM.payeeID).AnyAsync();
                         break;
                     default:
                         return false;
@@ -69,15 +72,30 @@ namespace CodeChallenge02.Repositories
                 if (payer == null || !hasPayee)
                     return false;
 
+                var payeeCPF = (transferenciaVM.payeeID.Length == 14) ? picPayContext.UsuariosComuns.Where(x => x.CPF == transferenciaVM.payeeID).FirstOrDefault() : null;
+                var payeeCNPJ = (transferenciaVM.payeeID.Length == 18) ? picPayContext.Lojistas.Where(x => x.CNPJ == transferenciaVM.payeeID).FirstOrDefault() : null;
+
                 if (!(payer.Saldo >= transferenciaVM.Amount))
                     return false;
 
-
-                // Realiza a transferencia. Resolver complexidade do PAYEE CNPJ/CPF 
                 payer.Saldo -= transferenciaVM.Amount;
 
+                if (payeeCPF != null)
+                {
+                    payeeCPF.Saldo += transferenciaVM.Amount;
+                    picPayContext.UsuariosComuns.Update(payeeCPF);
+                }
+                else if (payeeCNPJ != null)
+                {
+                    payeeCNPJ.Saldo += transferenciaVM.Amount;
+                    picPayContext.Lojistas.Update(payeeCNPJ);
+                }
+                else
+                    return false;
 
+                //Só vamos salvar, caso o Email Service tiver êxito.
 
+                await picPayContext.SaveChangesAsync();
 
                 return true;
             }

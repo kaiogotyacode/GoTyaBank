@@ -7,7 +7,7 @@ namespace CodeChallenge02.Repositories.Interfaces
     public interface ILojistaRepository
     {
         public Task<Lojista?> CreateLojista(LojistaVM lojistaVM);
-        public Task<bool> GetLojistaByID(LojistaVM lojistaVM);
+        public Task<bool> HasLojista(LojistaVM lojistaVM);
 
     }
 }
