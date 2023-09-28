@@ -1,6 +1,7 @@
 ﻿using CodeChallenge02.Database;
 using CodeChallenge02.Models;
 using CodeChallenge02.Repositories.Interfaces;
+using CodeChallenge02.Services.Interfaces;
 using CodeChallenge02.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,9 +12,11 @@ namespace CodeChallenge02.Repositories
     public class UsuarioComumRepository : IUsuarioComumRepository
     {
         private readonly PicPayContext picPayContext;
-        public UsuarioComumRepository(PicPayContext picPayContext)
+        private readonly IEmailService emailService;
+        public UsuarioComumRepository(PicPayContext picPayContext, IEmailService emailService)
         {
             this.picPayContext = picPayContext;
+            this.emailService = emailService;
         }
         #region Post Methods      
 
@@ -94,6 +97,16 @@ namespace CodeChallenge02.Repositories
                     return false;
 
                 //Só vamos salvar, caso o Email Service tiver êxito.
+                EmailServiceVM emailServiceVM = new()
+                {
+                    EmailSender = payer.Email,
+                    EmailReceiver = (transferenciaVM.payeeID.Length == 14) ? payeeCPF.Email : payeeCNPJ.Email,
+                    Subject = "PicPay Transfer",
+                    Body = $"Transfer of ${transferenciaVM.Amount} from {payer.Email} to {((transferenciaVM.payeeID.Length == 14) ? payeeCPF.Email : payeeCNPJ.Email)} was successfully completed!"
+                };
+
+                if (!(await emailService.SendEmail(emailServiceVM)).Successful)
+                    return false;
 
                 await picPayContext.SaveChangesAsync();
 

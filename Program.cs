@@ -1,6 +1,8 @@
 using CodeChallenge02.Database;
 using CodeChallenge02.Repositories;
 using CodeChallenge02.Repositories.Interfaces;
+using CodeChallenge02.Services;
+using CodeChallenge02.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +16,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<PicPayContext>(db => db.UseSqlServer(builder.Configuration.GetConnectionString("Database")));
 builder.Services.AddTransient<IUsuarioComumRepository, UsuarioComumRepository>();
 builder.Services.AddTransient<ILojistaRepository, LojistaRepository>();
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 var app = builder.Build();
 
